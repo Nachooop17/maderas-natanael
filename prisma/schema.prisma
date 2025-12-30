@@ -12,9 +12,11 @@ datasource db {
 // ... tus modelos Producto y Usuario siguen igual ...
 
 model Producto {
-  id          Int      @id @default(autoincrement())
-  nombre      String
-  precio      Float
-  imagenUrl   String
-  creadoEn    DateTime @default(now())
+  
+  id        String   @id @default(cuid()) 
+  
+  nombre    String
+  precio    Int      // O Float si prefieres
+  imagenUrl String
+  creadoEn  DateTime @default(now())
 }
