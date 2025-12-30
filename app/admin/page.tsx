@@ -11,7 +11,6 @@ export default async function AdminPage() {
       <h1 className="text-3xl font-bold mb-8 text-white">Panel de Administración</h1>
 
       {/* SECCIÓN FORMULARIO */}
-      {/* Agregamos 'text-gray-900' para que las letras sean oscuras */}
       <div className="bg-gray-100 p-6 rounded-lg mb-10 text-gray-900 shadow-md">
         <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">Agregar Nuevo Producto</h2>
         
@@ -62,8 +61,8 @@ export default async function AdminPage() {
       <h2 className="text-xl font-semibold mb-4 text-white">Inventario Actual</h2>
       
       <div className="grid gap-4">
-        {productos.map((prod) => (
-          // Agregamos 'text-gray-900' aquí también
+        {/* CORRECCIÓN AQUÍ: Agregamos ': any' para evitar el error de build */}
+        {productos.map((prod: any) => (
           <div key={prod.id} className="flex items-center justify-between border p-4 rounded-lg bg-white shadow-sm text-gray-900">
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 bg-gray-200 rounded overflow-hidden">
