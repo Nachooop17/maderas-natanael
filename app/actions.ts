@@ -1,85 +1,75 @@
 'use server'
 
-import { prisma } from "@/lib/prisma" // El @ apunta a la raiz ahora
+import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation"
 import { v2 as cloudinary } from 'cloudinary'
 
-// Función para guardar un producto
+// --- ESTA ES LA PARTE QUE FALTA ---
+// Forzamos la configuración explícita para que no haya dudas
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
+// ----------------------------------
+
 export async function crearProducto(formData: FormData) {
   const nombre = formData.get("nombre") as string
   const precio = parseFloat(formData.get("precio") as string)
-  const archivo = formData.get("imagen") as File // <--- Ahora recibimos un ARCHIVO
+  const imagen = formData.get("imagen") as File
 
   let imagenUrl = ""
 
-  // Lógica de subida a Cloudinary
-  if (archivo && archivo.size > 0) {
-    // Convertimos el archivo a un formato que Cloudinary entienda
-    const arrayBuffer = await archivo.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
+  if (imagen && imagen.size > 0) {
+    try {
+      const buffer = await imagen.arrayBuffer()
+      const bytes = Buffer.from(buffer)
 
-    // Subimos la imagen y esperamos la respuesta
-    const respuesta: any = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({}, (err, result) => {
-        if (err) reject(err)
-        resolve(result)
-      }).end(buffer)
-    })
+      // Subida a Cloudinary usando una Promesa para esperar la respuesta
+      const resultado = await new Promise<any>((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: "productos-maderas" }, // Carpeta opcional
+          (error, result) => {
+            if (error) reject(error)
+            else resolve(result)
+          }
+        )
+        uploadStream.end(bytes)
+      })
 
-    imagenUrl = respuesta.secure_url // <--- Aquí obtenemos el link real
-  } else {
-    // Imagen por defecto si no suben nada
-    imagenUrl = "https://via.placeholder.com/300" 
+      imagenUrl = resultado.secure_url
+    } catch (error) {
+      console.error("Error subiendo imagen:", error)
+      throw new Error("No se pudo subir la imagen")
+    }
   }
 
+  // Guardar en Base de Datos (Neon/Postgres)
   await prisma.producto.create({
     data: {
       nombre,
       precio,
-      imagenUrl,
-    },
+      imagenUrl
+    }
   })
 
-  revalidatePath("/admin")
   revalidatePath("/")
+  revalidatePath("/admin")
+  redirect("/admin")
 }
 
-// Función para borrar un producto
-export async function eliminarProducto(id: number) {
-  await prisma.producto.delete({
-    where: { id },
-  })
-
-  revalidatePath("/admin")
-  revalidatePath("/")
-}
-export async function login(formData: FormData) {
-  const password = formData.get("password") as string
-  
-  // AQUÍ DEFINES TU CONTRASEÑA MAESTRA
-  // En el futuro, esto vendrá de una variable de entorno segura
-  const CLAVE_SECRETA = "admin123" 
-
-  if (password === CLAVE_SECRETA) {
-    // Si la clave es correcta, creamos una cookie llamada "admin_session"
-    (await
-          // Si la clave es correcta, creamos una cookie llamada "admin_session"
-          cookies()).set("admin_session", "true", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // Dura 1 semana
-      path: "/",
-    })
-    redirect("/admin")
-  } else {
-    // Si falla, no hacemos nada (o podrías retornar un error)
-    console.log("Clave incorrecta")
+export async function eliminarProducto(id: string) {
+  const productoId = Number(id)
+  if (Number.isNaN(productoId)) {
+    throw new Error("Invalid product id")
   }
-}
 
-export async function logout() {
-  (await cookies()).delete("admin_session")
-  redirect("/")
+  await prisma.producto.delete({
+    where: { id: productoId }
+  })
+
+  revalidatePath("/")
+  revalidatePath("/admin")
 }
