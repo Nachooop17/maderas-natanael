@@ -1,14 +1,15 @@
 // prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  // Borra la linea de previewFeatures, no la necesitamos con Postgres
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db" 
+  provider = "postgresql" // <--- EL CAMBIO MÁGICO
+  url      = env("DATABASE_URL")
 }
+
+// ... tus modelos Producto y Usuario siguen igual ...
 
 model Producto {
   id          Int      @id @default(autoincrement())
