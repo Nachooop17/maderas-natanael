@@ -23,7 +23,7 @@ export default async function PaginaProducto({ params }: { params: { id: string 
 
   // Mensaje para WhatsApp
   const mensajeWhatsapp = `Hola, me interesa el producto ${producto.nombre} que vi en la web.`
-  const linkWhatsapp = `https://wa.me/569XXXXXXXX?text=${encodeURIComponent(mensajeWhatsapp)}`
+  const linkWhatsapp = `https://wa.me/56931222885?text=${encodeURIComponent(mensajeWhatsapp)}`
   // RECUERDA CAMBIAR EL 569XXXXXXXX POR TU NÚMERO REAL
 
   return (
