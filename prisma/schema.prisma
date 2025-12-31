@@ -12,11 +12,10 @@ datasource db {
 // ... tus modelos Producto y Usuario siguen igual ...
 
 model Producto {
-  
-  id        String   @id @default(cuid()) 
-  
-  nombre    String
-  precio    Int      // O Float si prefieres
-  imagenUrl String
-  creadoEn  DateTime @default(now())
+  id          String   @id @default(cuid())
+  nombre      String
+  descripcion String   @default("") // <--- AGREGA ESTO
+  precio      Int
+  imagenUrl   String
+  creadoEn    DateTime @default(now())
 }

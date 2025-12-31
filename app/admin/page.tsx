@@ -36,6 +36,17 @@ export default async function AdminPage() {
               placeholder="9990" 
             />
           </div>
+          <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Descripción del Producto
+              </label>
+              <textarea
+                name="descripcion"
+                required
+                placeholder="Ej: Madera de roble tallada a mano, ideal para masajes..."
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"
+              ></textarea>
+            </div>
 
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Foto del Producto</label>

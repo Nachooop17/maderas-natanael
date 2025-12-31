@@ -18,6 +18,8 @@ cloudinary.config({
 export async function crearProducto(formData: FormData) {
   const nombre = formData.get("nombre") as string
   const precio = parseFloat(formData.get("precio") as string)
+  // 1. LEER LA DESCRIPCIÓN
+  const descripcion = formData.get("descripcion") as string 
   const archivo = formData.get("imagen") as File
 
   let imagenUrl = ""
@@ -53,6 +55,7 @@ export async function crearProducto(formData: FormData) {
     data: {
       nombre,
       precio,
+      descripcion, // 2. GUARDARLA EN LA BASE DE DATOS
       imagenUrl,
     },
   })
